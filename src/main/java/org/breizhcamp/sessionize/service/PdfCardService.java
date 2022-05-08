@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.breizhcamp.sessionize.model.io.cfp.Format;
 import org.breizhcamp.sessionize.model.io.cfp.Proposal;
+import org.breizhcamp.sessionize.model.sessionize.Evalution;
 import org.breizhcamp.sessionize.model.sessionize.session.Sessions;
 import org.breizhcamp.sessionize.service.mapper.FormatMapperService;
 import org.breizhcamp.sessionize.service.mapper.ProposalMapperService;
@@ -15,13 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collector;
 
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toList;
+import static java.util.Comparator.*;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.substring;
@@ -40,7 +42,7 @@ public class PdfCardService {
     @Autowired
     private FormatMapperService formatMapper;
 
-    public void export(OutputStream out) throws DocumentException {
+    public void export(List<Evalution> evalutions, OutputStream out) throws DocumentException {
             Document document = new Document(PageSize.A4, 10, 10, 10, 10);
             PdfWriter writer = PdfWriter.getInstance(document, out);
 
@@ -84,15 +86,23 @@ public class PdfCardService {
                 }
             }
             */
-            List<Proposal> sortedProposals = new ArrayList<>();
+            List<Proposal> proposals = new ArrayList<>();
             List<Sessions> sessions = sessionService.getSessions();
             for (Sessions session : sessions){
-                sortedProposals.addAll(proposalMapper.mapFromSessionizeTrack(session));
+                proposals.addAll(proposalMapper.mapFromSessionizeSessions(session));
             }
-            /*List<Proposal> sortedProposals = proposals.stream()
-                    .sorted(comparing(Proposal::getFormat).thenComparing(Proposal::getMean, nullsLast(reverseOrder())))
+
+            for (Proposal proposal : proposals) {
+                Optional<Evalution> evalution = evalutions.stream().filter(e -> e.getSessionId().equals(String.valueOf(proposal.getId()))).findFirst();
+                if (evalution.isPresent()){
+                    proposal.setMean(evalution.get().getAverageRating());
+                }
+            }
+
+            List<Proposal> sortedProposals = proposals.stream()
+                    .sorted(Comparator.comparing(Proposal::getFormat).thenComparing(Proposal::getMean, nullsLast(reverseOrder())))
                     .collect(toList());
-            */
+
             LOGGER.info("Export PDF de {} Proposals", sortedProposals.size());
 
             Map<Integer, BaseColor> bgTracksColor = new HashMap<>();

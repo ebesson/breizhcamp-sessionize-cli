@@ -3,7 +3,10 @@ package org.breizhcamp.sessionize.service.mapper;
 import org.breizhcamp.sessionize.model.io.cfp.Proposal;
 import org.breizhcamp.sessionize.model.io.cfp.User;
 import org.breizhcamp.sessionize.model.sessionize.Constants;
-import org.breizhcamp.sessionize.model.sessionize.session.*;
+import org.breizhcamp.sessionize.model.sessionize.session.CategoryItem;
+import org.breizhcamp.sessionize.model.sessionize.session.Session;
+import org.breizhcamp.sessionize.model.sessionize.session.Sessions;
+import org.breizhcamp.sessionize.model.sessionize.session.Speaker;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -16,9 +19,10 @@ public class ProposalMapperService {
 
     public static final int SPEAKER_INDEX_FIRSTNAME = 0;
     public static final int SPEARKER_INDEX_LASTNAME = 1;
-    public List<Proposal> mapFromSessionizeTrack(Sessions sessions){
+
+    public List<Proposal> mapFromSessionizeSessions(Sessions sessions) {
         List<Proposal> proposals = new ArrayList<>();
-        for(Session session : sessions.getSessions()){
+        for (Session session : sessions.getSessions()) {
 
             Proposal proposal = new Proposal();
             proposal.setId(Integer.valueOf(session.getId()));
@@ -48,7 +52,7 @@ public class ProposalMapperService {
             speakers.remove(0);
 
             // Cospeakers
-            for (Speaker speaker : speakers){
+            for (Speaker speaker : speakers) {
                 proposal.getCospeakers().add(mapUserFromSpeaker(speaker));
             }
 
