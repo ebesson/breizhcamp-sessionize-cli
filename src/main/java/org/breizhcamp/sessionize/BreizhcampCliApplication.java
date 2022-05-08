@@ -1,0 +1,54 @@
+package org.breizhcamp.sessionize;
+
+import org.breizhcamp.sessionize.command.CardGeneratorCommand;
+import org.breizhcamp.sessionize.command.EmptyCommand;
+import org.breizhcamp.sessionize.command.SpeakerCommand;
+import org.springframework.boot.*;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import picocli.CommandLine;
+import picocli.CommandLine.IFactory;
+
+@SpringBootApplication
+public class BreizhcampCliApplication implements CommandLineRunner, ExitCodeGenerator {
+
+	private IFactory factory;
+	private CardGeneratorCommand cardGeneratorCommand;
+
+	private SpeakerCommand spearkerGeneratorCommand;
+	private int exitCode;
+
+	// constructor injection
+	BreizhcampCliApplication(IFactory factory, CardGeneratorCommand cardGeneratorCommand,
+							 SpeakerCommand spearkerGeneratorCommand) {
+		this.factory = factory;
+		this.cardGeneratorCommand = cardGeneratorCommand;
+		this.spearkerGeneratorCommand = spearkerGeneratorCommand;
+	}
+	@Override
+	public void run(String... args) {
+		// let picocli parse command line args and run the business logic
+		CommandLine commandLine = new CommandLine(new EmptyCommand());
+		commandLine.addSubcommand("card", cardGeneratorCommand);
+		commandLine.addSubcommand("speaker", spearkerGeneratorCommand);
+
+		commandLine.parseArgs(args);
+		if (commandLine.isUsageHelpRequested()) {
+			commandLine.usage(System.out);
+			return;
+		}
+		else
+		{
+			exitCode = commandLine.execute(args);
+		}
+	}
+
+	@Override
+	public int getExitCode() {
+		return exitCode;
+	}
+
+	public static void main(String[] args) {
+		// let Spring instantiate and inject dependencies
+		System.exit(SpringApplication.exit(SpringApplication.run(BreizhcampCliApplication.class, args)));
+	}
+}
