@@ -15,6 +15,7 @@
 	<description>A CLI to generate usefull files from Sessionize</description>
 	<properties>
 		<java.version>11</java.version>
+		<native-maven-plugin.version>0.9.19</native-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,8 +82,7 @@
 			<artifactId>spring-web</artifactId>
 			<version>5.3.19</version>
 		</dependency>
-    </dependencies>
-
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -95,6 +95,33 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>generate-autocompletion-script</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<arguments>
+						<argument>-Dpicocli.autocomplete.systemExitOnError</argument>
+						<argument>-cp</argument>
+						<classpath/>
+						<argument>picocli.AutoComplete</argument>
+						<argument>--force</argument><!-- overwrite if exists -->
+						<argument>--completionScript</argument>
+						<argument>${project.build.directory}/breizhcamp-sessionize-cli_completion</argument>
+						<argument>org.breizhcamp.sessionize.command.Autocomplete</argument>
+					</arguments>
 				</configuration>
 			</plugin>
 		</plugins>

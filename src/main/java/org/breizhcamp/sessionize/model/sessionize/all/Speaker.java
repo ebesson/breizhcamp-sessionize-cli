@@ -3,6 +3,7 @@ package org.breizhcamp.sessionize.model.sessionize.all;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,8 +14,8 @@ public class Speaker {
     String firstName;
     String lastName;
     String bio;
-    String profilePciture;
+    String profilePicture;
     String fullName;
     String tagLine;
-    List<Link> links;
+    List<Link> links = new ArrayList<>();
 }

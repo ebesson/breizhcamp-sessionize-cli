@@ -1,2 +1,5 @@
 ---
 sessionize_id:
+logging:
+  level:
+    root: INFO

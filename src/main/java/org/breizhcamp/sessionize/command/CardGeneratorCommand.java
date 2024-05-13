@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @Component
-@Command(name = "card")
+@Command(name = "card", description = "This command generate the pdf file with all cards")
 public class CardGeneratorCommand extends BaseCommand {
 
 

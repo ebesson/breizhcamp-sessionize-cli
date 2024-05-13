@@ -1,8 +1,6 @@
 package org.breizhcamp.sessionize;
 
-import org.breizhcamp.sessionize.command.CardGeneratorCommand;
-import org.breizhcamp.sessionize.command.EmptyCommand;
-import org.breizhcamp.sessionize.command.SpeakerCommand;
+import org.breizhcamp.sessionize.command.*;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import picocli.CommandLine;
@@ -13,23 +11,30 @@ public class BreizhcampCliApplication implements CommandLineRunner, ExitCodeGene
 
 	private IFactory factory;
 	private CardGeneratorCommand cardGeneratorCommand;
-
-	private SpeakerCommand spearkerGeneratorCommand;
+	private SpeakerCommand speakerGeneratorCommand;
+	private ScheduleCommand scheduleCommand;
+	private TalkCommand talkCommand;
 	private int exitCode;
 
 	// constructor injection
 	BreizhcampCliApplication(IFactory factory, CardGeneratorCommand cardGeneratorCommand,
-							 SpeakerCommand spearkerGeneratorCommand) {
+							 SpeakerCommand speakerGeneratorCommand, ScheduleCommand scheduleCommand,
+							 TalkCommand talkCommand) {
 		this.factory = factory;
 		this.cardGeneratorCommand = cardGeneratorCommand;
-		this.spearkerGeneratorCommand = spearkerGeneratorCommand;
+		this.speakerGeneratorCommand = speakerGeneratorCommand;
+		this.scheduleCommand = scheduleCommand;
+		this.talkCommand = talkCommand;
+
 	}
 	@Override
 	public void run(String... args) {
 		// let picocli parse command line args and run the business logic
 		CommandLine commandLine = new CommandLine(new EmptyCommand());
 		commandLine.addSubcommand("card", cardGeneratorCommand);
-		commandLine.addSubcommand("speaker", spearkerGeneratorCommand);
+		commandLine.addSubcommand("speaker", speakerGeneratorCommand);
+		commandLine.addSubcommand("schedule", scheduleCommand);
+		commandLine.addSubcommand("talk", talkCommand);
 
 		commandLine.parseArgs(args);
 		if (commandLine.isUsageHelpRequested()) {
